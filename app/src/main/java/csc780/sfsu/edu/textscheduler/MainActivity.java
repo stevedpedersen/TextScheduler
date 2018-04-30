@@ -1,57 +1,67 @@
-package csc780.sfsu.edu.textscheduler;
+package csc780.sfsu.edu.textscheduler;;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.arch.persistence.room.Room;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import com.bluelinelabs.conductor.Conductor;
+import com.bluelinelabs.conductor.Router;
+import com.bluelinelabs.conductor.RouterTransaction;
+
+import java.util.List;
+
+import csc780.sfsu.edu.textscheduler.controllers.base.*;
+import csc780.sfsu.edu.textscheduler.controllers.*;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import csc780.sfsu.edu.textscheduler.ActionBarProvider;
+import csc780.sfsu.edu.textscheduler.R;
+import csc780.sfsu.edu.textscheduler.model.AppDatabase;
+import csc780.sfsu.edu.textscheduler.model.Text;
+import csc780.sfsu.edu.textscheduler.model.TextViewModel;
+
+public final class MainActivity extends AppCompatActivity implements ActionBarProvider {
+
+    @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.controller_container) ViewGroup container;
+    private TextViewModel mTextViewModel;
+
+    private Router router;
+    private AppDatabase mDb;
+    private static final int NEW_TEXT_ACTIVITY_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
+
         setSupportActionBar(toolbar);
+        Intent intent = new Intent(MainActivity.this, NewTextController.class);
+        startActivityForResult(intent, NEW_TEXT_ACTIVITY_REQUEST_CODE);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "text-scheduler").build();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        Log.d("OK   ", "CHEESE!");
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        router = Conductor.attachRouter(this, container, savedInstanceState);
+        if (!router.hasRootController()) {
+            HomeController homeController = new HomeController(this);
+            router.setRoot(RouterTransaction.with(homeController));
         }
-
-        return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onBackPressed() {
+        if (!router.handleBack()) {
+            super.onBackPressed();
+        }
+    }
+
 }
