@@ -26,14 +26,14 @@ public class NewTextController extends BaseController {
     private static final String KEY_TEXT = "New Text Message.text";
     public static final String EXTRA_REPLY = "com.example.android.wordlistsql.REPLY";
 
-    @BindView(R.id.edit_title) TextView tvTitle;
-    @BindView(R.id.edit_title) TextView tvTextTitle;
-    @BindView(R.id.edit_message) TextView tvMessage;
-    @BindView(R.id.edit_date) TextView tvDate;
-    @BindView(R.id.edit_first) TextView tvFirst;
-    @BindView(R.id.edit_last) TextView tvLast;
-    @BindView(R.id.edit_phone) TextView tvPhone;
-    @BindView(R.id.button_save) Button saveButton;
+//    @BindView(R.id.tv_title) TextView tvTitle;
+//    @BindView(R.id.edit_title) TextView tvTextTitle;
+//    @BindView(R.id.edit_message) TextView tvMessage;
+//    @BindView(R.id.edit_date) TextView tvDate;
+//    @BindView(R.id.edit_first) TextView tvFirst;
+//    @BindView(R.id.edit_last) TextView tvLast;
+//    @BindView(R.id.edit_phone) TextView tvPhone;
+//    @BindView(R.id.button_save) Button saveButton;
 
     public NewTextController(String text) {
         this(new BundleBuilder(new Bundle())
@@ -56,7 +56,7 @@ public class NewTextController extends BaseController {
     public void onViewBound(@NonNull View view) {
         super.onViewBound(view);
 //        textView.setText(getArgs().getString(KEY_TEXT));
-        tvTitle.setText(getArgs().getString(KEY_TEXT));
+//        tvTitle.setText(getArgs().getString(KEY_TEXT));
     }
 
     @OnClick(R.id.button_save)

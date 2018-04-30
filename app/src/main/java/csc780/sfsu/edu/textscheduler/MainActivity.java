@@ -47,8 +47,8 @@ public final class MainActivity extends AppCompatActivity implements ActionBarPr
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
-        Intent intent = new Intent(MainActivity.this, NewTextController.class);
-        startActivityForResult(intent, NEW_TEXT_ACTIVITY_REQUEST_CODE);
+//        Intent intent = new Intent(MainActivity.this, NewTextController.class);
+//        startActivityForResult(intent, NEW_TEXT_ACTIVITY_REQUEST_CODE);
 
         router = Conductor.attachRouter(this, container, savedInstanceState);
         if (!router.hasRootController()) {

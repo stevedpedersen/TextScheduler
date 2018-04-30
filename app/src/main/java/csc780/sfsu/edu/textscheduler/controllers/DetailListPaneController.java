@@ -13,12 +13,18 @@ import android.widget.TextView;
 
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import csc780.sfsu.edu.textscheduler.R;
 import csc780.sfsu.edu.textscheduler.controllers.base.BaseController;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import csc780.sfsu.edu.textscheduler.model.Text;
 
 public class DetailListPaneController extends BaseController {
 
@@ -45,6 +51,16 @@ public class DetailListPaneController extends BaseController {
 
     private int selectedIndex;
     private boolean twoPaneView;
+    private List texts;
+    private Text text;
+
+    public DetailListPaneController() {}
+
+    public DetailListPaneController(Text text) {
+        this.text = text;
+        this.texts = new ArrayList<Text>();
+        this.texts.add(text);
+    }
 
     @Override
     protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
@@ -57,7 +73,7 @@ public class DetailListPaneController extends BaseController {
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        recyclerView.setAdapter(new DetailItemAdapter(LayoutInflater.from(view.getContext()), DetailItemModel.values()));
+        recyclerView.setAdapter(new DetailItemAdapter(LayoutInflater.from(view.getContext()), texts));
 
         twoPaneView = (detailContainer != null);
         if (twoPaneView) {
@@ -81,7 +97,7 @@ public class DetailListPaneController extends BaseController {
 
     @Override
     protected String getTitle() {
-        return "Master/Detail Flow";
+        return text.getTitle();
     }
 
     void onRowSelected(int index) {
@@ -102,9 +118,9 @@ public class DetailListPaneController extends BaseController {
     class DetailItemAdapter extends RecyclerView.Adapter<DetailItemAdapter.ViewHolder> {
 
         private final LayoutInflater inflater;
-        private final DetailItemModel[] items;
+        private final List<Text> items;
 
-        public DetailItemAdapter(LayoutInflater inflater, DetailItemModel[] items) {
+        public DetailItemAdapter(LayoutInflater inflater, List<Text> items) {
             this.inflater = inflater;
             this.items = items;
         }
@@ -116,12 +132,12 @@ public class DetailListPaneController extends BaseController {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.bind(items[position], position);
+            holder.bind(items.get(position), position);
         }
 
         @Override
         public int getItemCount() {
-            return items.length;
+            return items.size();
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
@@ -135,8 +151,8 @@ public class DetailListPaneController extends BaseController {
                 ButterKnife.bind(this, itemView);
             }
 
-            void bind(DetailItemModel item, int position) {
-                tvTitle.setText(item.title);
+            void bind(Text item, int position) {
+                tvTitle.setText(item.getTitle());
                 this.position = position;
 
                 if (twoPaneView && position == selectedIndex) {

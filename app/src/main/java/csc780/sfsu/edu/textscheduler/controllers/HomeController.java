@@ -1,27 +1,20 @@
 package csc780.sfsu.edu.textscheduler.controllers;
 
 import android.app.Activity;
+import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff.Mode;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.URLSpan;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,66 +29,23 @@ import com.bluelinelabs.conductor.ControllerChangeHandler;
 import com.bluelinelabs.conductor.ControllerChangeType;
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
-import com.bluelinelabs.conductor.changehandler.TransitionChangeHandlerCompat;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-
 import csc780.sfsu.edu.textscheduler.R;
-import csc780.sfsu.edu.textscheduler.changehandler.FabToDialogTransitionChangeHandler;
 import csc780.sfsu.edu.textscheduler.controllers.base.BaseController;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import csc780.sfsu.edu.textscheduler.model.AppDatabase;
-import csc780.sfsu.edu.textscheduler.model.Recipient;
-import csc780.sfsu.edu.textscheduler.model.RecipientDao;
-import csc780.sfsu.edu.textscheduler.model.Schedule;
-import csc780.sfsu.edu.textscheduler.model.ScheduleDao;
 import csc780.sfsu.edu.textscheduler.model.Text;
-import csc780.sfsu.edu.textscheduler.model.TextDao;
 import csc780.sfsu.edu.textscheduler.model.TextViewModel;
 
 public class HomeController extends BaseController {
 
-    private enum DemoModel {
-        NAVIGATION("Navigation Demos", R.color.red_300),
-        TRANSITIONS("Transition Demos", R.color.blue_grey_300),
-        SHARED_ELEMENT_TRANSITIONS("Shared Element Demos", R.color.purple_300),
-        CHILD_CONTROLLERS("Child Controllers", R.color.orange_300),
-        VIEW_PAGER("ViewPager", R.color.green_300),
-        TARGET_CONTROLLER("Target Controller", R.color.pink_300),
-        MULTIPLE_CHILD_ROUTERS("Multiple Child Routers", R.color.deep_orange_300),
-        MASTER_DETAIL("Master Detail", R.color.grey_300),
-        DRAG_DISMISS("Drag Dismiss", R.color.lime_300),
-        EXTERNAL_MODULES("Bonus Modules", R.color.teal_300);
-
-        String title;
-        @ColorRes int color;
-
-        DemoModel(String title, @ColorRes int color) {
-            this.title = title;
-            this.color = color;
-        }
-    }
-    public void setColors() {
-        int[] colors = {R.color.red_300, R.color.blue_grey_300, R.color.purple_300,
-                R.color.orange_300, R.color.green_300, R.color.pink_300, R.color.deep_orange_300,
-                R.color.grey_300, R.color.lime_300, R.color.teal_300};
-        this.colors = colors;
-    }
-    private List<Text> currentTexts;
-    private int[] colors;
-
-    private TextDao mTextDao;
-    private ScheduleDao mScheduleDao;
-    private RecipientDao mRecipientDao;
-    private AppDatabase mDb;
-
     private Activity activity;
+    private LifecycleOwner lifecycleOwner;
     private TextViewModel mTextViewModel;
+    private int[] colors;
 
     private static final String KEY_FAB_VISIBILITY = "HomeController.fabVisibility";
     public static final int NEW_TEXT_ACTIVITY_REQUEST_CODE = 1;
@@ -106,14 +56,10 @@ public class HomeController extends BaseController {
 
     public HomeController() {}
     public HomeController(Activity activity) {
+        this.lifecycleOwner = (LifecycleOwner) activity;
         this.activity = activity;
         setHasOptionsMenu(true);
-        createData();
         setColors();
-    }
-
-    public void createData() {
-        this.mDb = Room.inMemoryDatabaseBuilder(this.activity, AppDatabase.class).build();
     }
 
     @NonNull
@@ -126,11 +72,9 @@ public class HomeController extends BaseController {
     protected void onViewBound(@NonNull View view) {
         super.onViewBound(view);
 
-        recyclerView.setHasFixedSize(true);
-        final TextListAdapter adapter = new TextListAdapter(view.getContext());
-        mTextViewModel = new TextViewModel(this.activity.getApplication());
-//        mTextViewModel = ViewModelProviders.of(this.activity).get(TextViewModel.class);
-        mTextViewModel.getAllTexts().observe(this.activity, new Observer<List<Text>>() {
+        final TextListAdapter adapter = new TextListAdapter(view.getContext(), colors);
+        mTextViewModel = ViewModelProviders.of((FragmentActivity) activity).get(TextViewModel.class);
+        mTextViewModel.getAllTexts().observe(lifecycleOwner, new Observer<List<Text>>() {
             @Override
             public void onChanged(@Nullable final List<Text> texts) {
                 // Update the cached copy of the texts in the adapter.
@@ -138,6 +82,7 @@ public class HomeController extends BaseController {
             }
         });
 
+        recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
     }
@@ -214,41 +159,86 @@ public class HomeController extends BaseController {
     }
 
     void onModelRowClick(Text text, int position) {
-        getRouter().pushController(RouterTransaction.with(new DetailListPaneController())
+        getRouter().pushController(RouterTransaction.with(new DetailListPaneController(text))
                 .pushChangeHandler(new FadeChangeHandler())
                 .popChangeHandler(new FadeChangeHandler()));
     }
+
+    public void setColors() {
+        int[] colors = {R.color.red_300, R.color.blue_grey_300, R.color.purple_300,
+                R.color.orange_300, R.color.green_300, R.color.pink_300, R.color.deep_orange_300,
+                R.color.grey_300, R.color.lime_300, R.color.teal_300};
+        this.colors = colors;
+    }
+
+    // ********************************************************************************************
     public class TextListAdapter extends RecyclerView.Adapter<TextListAdapter.TextViewHolder> {
-
-        class TextViewHolder extends RecyclerView.ViewHolder {
-            private final TextView textItemView;
-
-            private TextViewHolder(View itemView) {
-                super(itemView);
-                textItemView = itemView.findViewById(R.id.textView);
-            }
-        }
 
         private final LayoutInflater mInflater;
         private List<Text> mTexts; // Cached copy of texts
+        private final int[] colors;
 
-        TextListAdapter(Context context) { mInflater = LayoutInflater.from(context); }
+        TextListAdapter(Context context, int[] colors) {
+            mInflater = LayoutInflater.from(context);
+            this.colors = colors;
+        }
+
+        //    ********************************************************************
+        class TextViewHolder extends RecyclerView.ViewHolder {
+            @BindView(R.id.tv_title) TextView tvTitle;
+            @BindView(R.id.img_dot) ImageView imgDot;
+            private Text text;
+            private int position;
+            private int[] colors;
+            private int color;
+
+            private TextViewHolder(View itemView, int[] colors) {
+                super(itemView);
+                ButterKnife.bind(this, itemView);
+                this.colors = colors;
+            }
+
+            void bind(int position, Text item) {
+                text = item;
+                this.color = colors[position];
+                tvTitle.setText(text.getTextSummary());
+                imgDot.getDrawable().setColorFilter(ContextCompat.getColor(getActivity(), this.color), Mode.SRC_ATOP);
+                this.position = position;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    tvTitle.setTransitionName(getResources().getString(R.string.transition_tag_title_indexed, position));
+                    imgDot.setTransitionName(getResources().getString(R.string.transition_tag_dot_indexed, position));
+                }
+            }
+
+            @OnClick(R.id.row_root)
+            void onRowClick() {
+                onModelRowClick(text, position);
+            }
+        }
 
         @Override
         public TextViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+//            return new TextListAdapter.TextViewHolder(mInflater.inflate(R.layout.row_home, parent, false), this.colors);
+
             View itemView = mInflater.inflate(R.layout.recyclerview_item, parent, false);
-            return new TextViewHolder(itemView);
+            return new TextListAdapter.TextViewHolder(itemView, this.colors);
         }
 
         @Override
         public void onBindViewHolder(TextViewHolder holder, int position) {
-            if (mTexts != null) {
-                Text current = mTexts.get(position);
-                holder.textItemView.setText(current.getTextSummary());
-            } else {
-                // Covers the case of data not being ready yet.
-                holder.textItemView.setText("No Text");
-            }
+            holder.bind(position, mTexts.get(position));
+//            if (mTexts != null) {
+//                Text current = mTexts.get(position);
+//                if (holder.textItemView != null) {
+//                    holder.textItemView.setText(current.getTextSummary());
+//                }
+//
+//                holder.bind(position, current);
+//            } else {
+//                // Covers the case of data not being ready yet.
+//                holder.textItemView.setText("No Text");
+//            }
         }
 
         void setTexts(List<Text> texts){
@@ -265,73 +255,6 @@ public class HomeController extends BaseController {
             else return 0;
         }
     }
-//    class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
-//
-//        private final LayoutInflater inflater;
-//        private final List<Text> items;
-//        private final int[] colors;
-//
-//        public HomeAdapter(LayoutInflater inflater, List<Text> items, int[] colors) {
-//            this.inflater = inflater;
-//            this.items = items;
-//            this.colors = colors;
-//        }
-//
-//        @Override
-//        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//            return new ViewHolder(inflater.inflate(R.layout.row_home, parent, false), this.colors);
-//        }
-//
-//        @Override
-//        public void onBindViewHolder(ViewHolder holder, int position) {
-//            holder.bind(position, items.get(position));
-//        }
-//
-//        @Override
-//        public int getItemCount() {
-//            if (items == null) return 0;
-//            return items.size();
-//        }
-//
-//        class ViewHolder extends RecyclerView.ViewHolder {
-//
-//            @BindView(R.id.tv_title) TextView tvTitle;
-//            @BindView(R.id.img_dot) ImageView imgDot;
-//            private Text text;
-//            private int position;
-//            private int[] colors;
-//            private int color;
-//
-//            public ViewHolder(View itemView, int[] colors) {
-//                super(itemView);
-//                this.colors = colors;
-//                ButterKnife.bind(this, itemView);
-//            }
-//
-//            void bind(int position, Text item) {
-//                text = item;
-//                this.color = colors[position];
-////                tvTitle.setText(item.getTitle());
-//                tvTitle.setText("Cheese");
-//                imgDot.getDrawable().setColorFilter(ContextCompat.getColor(getActivity(), this.color), Mode.SRC_ATOP);
-//                this.position = position;
-//
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                    tvTitle.setTransitionName(getResources().getString(R.string.transition_tag_title_indexed, position));
-//                    imgDot.setTransitionName(getResources().getString(R.string.transition_tag_dot_indexed, position));
-//                }
-//            }
-//
-//            @OnClick(R.id.row_root)
-//            void onRowClick() {
-//                onModelRowClick(text, position);
-//            }
-//
-//        }
-//    }
-
-
-
 
 
 }

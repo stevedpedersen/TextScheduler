@@ -62,7 +62,7 @@ public abstract class AppDatabase extends RoomDatabase {
         }
 
         private void makeDummyData() {
-            Text text = new Text(); //TestUtil.createText();
+            Text text = new Text();
             text.setTitle("Standard Happy Birthday Text");
             text.setMessage("Happy Birthday! You're so old now!\n\n-Steve\nxoxo");
             long textId = mTextDao.insertText(text);
@@ -77,20 +77,30 @@ public abstract class AppDatabase extends RoomDatabase {
             schedule.setSendDate("2018-04-20");
             mScheduleDao.insert(schedule);
 
-            Text text2 = new Text(); //TestUtil.createText();
-            text.setTitle("Happy Anniversary");
-            text.setMessage("Happy Anniversary! I love you more every year!\n\n-Steve\nxoxo");
+            Text text2 = new Text();
+            text2.setTitle("Happy Anniversary");
+            text2.setMessage("Happy Anniversary! I love you more every year!\n\n-Steve\nxoxo");
             long textId2 = mTextDao.insertText(text2);
 
             Recipient recipient2 = new Recipient((int) textId2);
-            recipient.setFirstName("Joe");
-            recipient.setLastName("Shmoe");
-            recipient.setPhone("209-555-5555");
+            recipient2.setFirstName("Joe");
+            recipient2.setLastName("Shmoe");
+            recipient2.setPhone("209-555-5555");
             mRecipientDao.insert(recipient2);
 
             Schedule schedule2 = new Schedule((int) textId2);
-            schedule.setSendDate("2019-03-20");
+            schedule2.setSendDate("2019-03-20");
             mScheduleDao.insert(schedule2);
+
+            Text text3 = new Text();
+            text3.setTitle("Happy Father's Day");
+            text3.setMessage("Happy fathers day, old man.\n\n-Steve\nxoxo");
+            long textId3 = mTextDao.insertText(text3);
+
+            Text text4 = new Text();
+            text4.setTitle("Job Application Follow Up");
+            text4.setMessage("Hello, just wanted to say thanks for the interview.\n\n-Steve Pedersen");
+            long textId4 = mTextDao.insertText(text4);
 
         }
     }
