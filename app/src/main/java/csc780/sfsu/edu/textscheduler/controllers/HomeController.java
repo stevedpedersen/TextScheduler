@@ -77,6 +77,7 @@ public class HomeController extends BaseController {
         mTextViewModel.getAllTexts().observe(lifecycleOwner, new Observer<List<Text>>() {
             @Override
             public void onChanged(@Nullable final List<Text> texts) {
+                // update UI
                 // Update the cached copy of the texts in the adapter.
                 adapter.setTexts(texts);
             }
@@ -152,14 +153,14 @@ public class HomeController extends BaseController {
     }
 
     private void onFabClicked(boolean fromFab) {
-        getRouter().pushController(RouterTransaction.with(new NewTextController("Called from HomeController"))
+        getRouter().pushController(RouterTransaction.with(new NewTextController(activity))
                 .pushChangeHandler(new FadeChangeHandler())
                 .popChangeHandler(new FadeChangeHandler()));
 
     }
 
-    void onModelRowClick(Text text, int position) {
-        getRouter().pushController(RouterTransaction.with(new DetailListPaneController(text))
+    void onModelRowClick(Text text, int position, int color) {
+        getRouter().pushController(RouterTransaction.with(new DetailListPaneController(text, color))
                 .pushChangeHandler(new FadeChangeHandler())
                 .popChangeHandler(new FadeChangeHandler()));
     }
@@ -213,32 +214,30 @@ public class HomeController extends BaseController {
 
             @OnClick(R.id.row_root)
             void onRowClick() {
-                onModelRowClick(text, position);
+                onModelRowClick(text, position, color);
             }
         }
 
         @Override
         public TextViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//            return new TextListAdapter.TextViewHolder(mInflater.inflate(R.layout.row_home, parent, false), this.colors);
-
             View itemView = mInflater.inflate(R.layout.recyclerview_item, parent, false);
             return new TextListAdapter.TextViewHolder(itemView, this.colors);
         }
 
         @Override
         public void onBindViewHolder(TextViewHolder holder, int position) {
-            holder.bind(position, mTexts.get(position));
-//            if (mTexts != null) {
-//                Text current = mTexts.get(position);
-//                if (holder.textItemView != null) {
-//                    holder.textItemView.setText(current.getTextSummary());
-//                }
-//
-//                holder.bind(position, current);
-//            } else {
-//                // Covers the case of data not being ready yet.
-//                holder.textItemView.setText("No Text");
-//            }
+//            holder.bind(position, mTexts.get(position));
+            if (mTexts != null) {
+                Text current = mTexts.get(position);
+                if (holder.tvTitle != null) {
+                    holder.tvTitle.setText(current.getTextSummary());
+                }
+
+                holder.bind(position, current);
+            } else {
+                // Covers the case of data not being ready yet.
+                holder.tvTitle.setText("No Text");
+            }
         }
 
         void setTexts(List<Text> texts){

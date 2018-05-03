@@ -16,7 +16,6 @@ import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import csc780.sfsu.edu.textscheduler.R;
 import csc780.sfsu.edu.textscheduler.controllers.base.BaseController;
@@ -30,22 +29,7 @@ public class DetailListPaneController extends BaseController {
 
     private static final String KEY_SELECTED_INDEX = "DetailListPaneController.selectedIndex";
 
-    public enum DetailItemModel {
-        ONE("Item 1", "This is a quick demo of master/detail flow using Conductor. In portrait mode you'll see a standard list. In landscape, you'll see a two-pane layout.", R.color.green_300),
-        TWO("Item 2", "This is another item.", R.color.cyan_300),
-        THREE("Item 3", "Wow, a 3rd item!", R.color.deep_purple_300);
-
-        String title;
-        String detail;
-        int backgroundColor;
-
-        DetailItemModel(String title, String detail, int backgroundColor) {
-            this.title = title;
-            this.detail = detail;
-            this.backgroundColor = backgroundColor;
-        }
-    }
-
+    @BindView(R.id.tv_title) TextView tvTitle;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @Nullable @BindView(R.id.detail_container) ViewGroup detailContainer;
 
@@ -53,24 +37,27 @@ public class DetailListPaneController extends BaseController {
     private boolean twoPaneView;
     private List texts;
     private Text text;
+    private int color;
 
     public DetailListPaneController() {}
 
-    public DetailListPaneController(Text text) {
+    public DetailListPaneController(Text text, int color) {
         this.text = text;
+        this.color = color;
         this.texts = new ArrayList<Text>();
         this.texts.add(text);
     }
 
     @Override
     protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        return inflater.inflate(R.layout.controller_master_detail_list, container, false);
+        return inflater.inflate(R.layout.controller_detail_list_pane, container, false);
     }
 
     @Override
     protected void onViewBound(@NonNull View view) {
         super.onViewBound(view);
 
+        tvTitle.setText(text.getTitle());
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         recyclerView.setAdapter(new DetailItemAdapter(LayoutInflater.from(view.getContext()), texts));
@@ -103,8 +90,7 @@ public class DetailListPaneController extends BaseController {
     void onRowSelected(int index) {
         selectedIndex = index;
 
-        DetailItemModel model = DetailItemModel.values()[index];
-        ChildController controller = new ChildController(model.detail, model.backgroundColor, true);
+        ChildController controller = new ChildController(text, color, true);
 
         if (twoPaneView) {
             getChildRouter(detailContainer).setRoot(RouterTransaction.with(controller));
@@ -127,7 +113,7 @@ public class DetailListPaneController extends BaseController {
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ViewHolder(inflater.inflate(R.layout.row_detail_item, parent, false));
+            return new ViewHolder(inflater.inflate(R.layout.row_detail_item, parent, false), items);
         }
 
         @Override
@@ -145,9 +131,11 @@ public class DetailListPaneController extends BaseController {
             @BindView(R.id.row_root) View root;
             @BindView(R.id.tv_title) TextView tvTitle;
             private int position;
+            private List<Text> texts;
 
-            public ViewHolder(View itemView) {
+            public ViewHolder(View itemView, List<Text> texts) {
                 super(itemView);
+                this.texts = texts;
                 ButterKnife.bind(this, itemView);
             }
 

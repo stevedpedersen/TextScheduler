@@ -11,7 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:listitem="@layout/row_home" />
-        />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
