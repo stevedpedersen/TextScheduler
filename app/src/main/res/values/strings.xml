@@ -6,21 +6,26 @@
     <string name="about">About</string>
 
     <!--New Text Controller-->
+    <string name="undo_string"></string>
+    <string name="label_title">Title</string>
     <string name="hint_title">Friends: How are you?</string>
-    <string name="hint_message">Hey |%FIRST_NAME%|, how are you doing?</string>
+    <string name="label_message">Message</string>
+    <string name="hint_message">Hey friend, how are you doing?</string>
+    <string name="label_date">Date</string>
+    <string name="hint_date">YYYY-MM-DD HH:mm pm</string>
     <string name="schedule_date">Send this message on...</string>
+    <string name="label_first">First</string>
     <string name="recipient_first">Recipient first name</string>
+    <string name="label_last">Last</string>
     <string name="recipient_last">Last name</string>
+    <string name="label_phone">Phone</string>
     <string name="recipient_phone">Phone</string>
     <string name="button_save">Save</string>
     <string name="empty_title_not_saved">You must enter a title.</string>
     <string name="empty_message_not_saved">You must enter a message.</string>
     <string name="empty_firstname_not_saved">You must enter a first name for the recipient.</string>
-    <string name="empty_phone_not_saved">You must enter the recipients phone number.</string>
+    <string name="empty_phone_not_saved">You must enter a recipient phone number.</string>
 
-
-    <!-- Transitions Demo -->
-    <string name="next">Next</string>
 
 
     <!-- Transitions -->

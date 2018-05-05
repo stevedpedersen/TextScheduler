@@ -88,21 +88,21 @@ public class HomeController extends BaseController {
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
     }
 
-    // TODO: this probably doesnt belong here
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        // TODO: Fix the result code here
-        if (requestCode == NEW_TEXT_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            Text text = new Text(data.getStringExtra(NewTextController.EXTRA_REPLY));
-            mTextViewModel.insert(text);
-        } else {
-            Toast.makeText(
-                    getApplicationContext(),
-                    R.string.empty_title_not_saved,
-                    Toast.LENGTH_LONG).show();
-        }
-    }
+//    // TODO: this probably doesnt belong here
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        // TODO: Fix the result code here
+//        if (requestCode == NEW_TEXT_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
+//            Text text = new Text(data.getStringExtra(NewTextController.EXTRA_REPLY));
+//            mTextViewModel.insert(text);
+//        } else {
+//            Toast.makeText(
+//                    getApplicationContext(),
+//                    R.string.empty_title_not_saved,
+//                    Toast.LENGTH_LONG).show();
+//        }
+//    }
 
     @Override
     protected void onSaveViewState(@NonNull View view, @NonNull Bundle outState) {
