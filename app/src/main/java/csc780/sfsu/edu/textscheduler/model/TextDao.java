@@ -72,7 +72,7 @@ public interface TextDao {
     public long insertText(Text text);
 
     @Insert
-    void insert(Text text);
+    public long insert(Text text);
 
     // Although usually not necessary, you can have this method return an int
     // value instead, indicating the number of rows updated in the database.

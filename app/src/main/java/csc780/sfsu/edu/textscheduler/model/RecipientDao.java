@@ -21,7 +21,7 @@ public interface RecipientDao {
 //    List<Schedule> loadAllByIds(int[] scheduleIds);
 
     @Query("SELECT * FROM recipients WHERE text_id = :textId")
-    List<Recipient> findByTextId(int textId);
+    LiveData<List<Recipient>> findByTextId(int textId);
 
     @Query("SELECT * FROM recipients WHERE phone LIKE :phone LIMIT 1")
     Recipient findByPhone(String phone);

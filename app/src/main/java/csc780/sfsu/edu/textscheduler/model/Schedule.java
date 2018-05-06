@@ -33,6 +33,7 @@ public class Schedule {
 
     // Getters and setters are ignored for brevity,
     // but they're required for Room to work.
+    public Schedule() {}
     public Schedule(int textId) {
         this.textId = textId;
         this.sent = false;

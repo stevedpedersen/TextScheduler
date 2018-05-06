@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -47,6 +48,7 @@ public class HomeController extends BaseController {
     private TextViewModel mTextViewModel;
     private int[] colors;
 
+    private static final String TAG = "HomeController";
     private static final String KEY_FAB_VISIBILITY = "HomeController.fabVisibility";
     public static final int NEW_TEXT_ACTIVITY_REQUEST_CODE = 1;
     public static final int RESULT_OK = 1;
@@ -65,6 +67,7 @@ public class HomeController extends BaseController {
     @NonNull
     @Override
     protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
+        Log.d(TAG, "------ in inflateView()");
         return inflater.inflate(R.layout.controller_home, container, false);
     }
 
@@ -86,33 +89,20 @@ public class HomeController extends BaseController {
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        Log.d(TAG, "------ in onViewBound()");
     }
-
-//    // TODO: this probably doesnt belong here
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        // TODO: Fix the result code here
-//        if (requestCode == NEW_TEXT_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-//            Text text = new Text(data.getStringExtra(NewTextController.EXTRA_REPLY));
-//            mTextViewModel.insert(text);
-//        } else {
-//            Toast.makeText(
-//                    getApplicationContext(),
-//                    R.string.empty_title_not_saved,
-//                    Toast.LENGTH_LONG).show();
-//        }
-//    }
 
     @Override
     protected void onSaveViewState(@NonNull View view, @NonNull Bundle outState) {
         super.onSaveViewState(view, outState);
         outState.putInt(KEY_FAB_VISIBILITY, fab.getVisibility());
+        Log.d(TAG, "------ in onSaveViewState()");
     }
 
     @Override
     protected void onRestoreViewState(@NonNull View view, @NonNull Bundle savedViewState) {
         super.onRestoreViewState(view, savedViewState);
+        Log.d(TAG, "------ in onRestoreViewState()");
 
         //noinspection WrongConstant
         fab.setVisibility(savedViewState.getInt(KEY_FAB_VISIBILITY));
@@ -122,12 +112,13 @@ public class HomeController extends BaseController {
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.home, menu);
+        Log.d(TAG, "------ in onCreateOptionsMenu()");
     }
 
     @Override
     protected void onChangeStarted(@NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) {
         setOptionsMenuHidden(!changeType.isEnter);
-
+        Log.d(TAG, "------ in onChangeStarted()");
         if (changeType.isEnter) {
             setTitle();
         }
@@ -230,7 +221,7 @@ public class HomeController extends BaseController {
             if (mTexts != null) {
                 Text current = mTexts.get(position);
                 if (holder.tvTitle != null) {
-                    holder.tvTitle.setText(current.getTextSummary());
+                    holder.tvTitle.setText(current.getTextShortSummary());
                 }
 
                 holder.bind(position, current);

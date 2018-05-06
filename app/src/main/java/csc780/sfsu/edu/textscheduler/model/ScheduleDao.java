@@ -16,11 +16,14 @@ public interface ScheduleDao {
     @Query("SELECT * FROM schedules")
     LiveData<List<Schedule>> getAll();
 
+    @Query("SELECT * FROM schedules WHERE id = :id LIMIT 1")
+    LiveData<List<Schedule>> get(int id);
+
     @Query("SELECT * FROM schedules WHERE id IN (:scheduleIds)")
     List<Schedule> loadAllByIds(int[] scheduleIds);
 
     @Query("SELECT * FROM schedules WHERE text_id = :textId LIMIT 1")
-    Schedule findByTextId(int textId);
+    LiveData<List<Schedule>> findByTextId(int textId);
 
     @Query("SELECT * FROM schedules WHERE id = :id LIMIT 1")
     Schedule findById(int id);

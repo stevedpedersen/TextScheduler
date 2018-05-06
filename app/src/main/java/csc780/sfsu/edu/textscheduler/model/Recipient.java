@@ -34,6 +34,7 @@ public class Recipient {
     @ColumnInfo(name = "phone")
     public String phone;
 
+    public Recipient() {}
     public Recipient(int textId) {
         this.textId = textId;
     }

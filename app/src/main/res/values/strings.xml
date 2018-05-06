@@ -6,6 +6,8 @@
     <string name="about">About</string>
 
     <!--New Text Controller-->
+    <string name="new_text">New Text</string>
+    <string name="new_text_title">Schedule New Text Message</string>
     <string name="undo_string"></string>
     <string name="label_title">Title</string>
     <string name="hint_title">Friends: How are you?</string>
@@ -25,6 +27,8 @@
     <string name="empty_message_not_saved">You must enter a message.</string>
     <string name="empty_firstname_not_saved">You must enter a first name for the recipient.</string>
     <string name="empty_phone_not_saved">You must enter a recipient phone number.</string>
+    <string name="error_saving">There was an error trying to save the text. Check the information and try again.</string>
+    <string name="success_saving">Your text has been scheduled!</string>
 
 
 

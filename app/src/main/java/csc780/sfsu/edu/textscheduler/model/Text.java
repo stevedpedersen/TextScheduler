@@ -40,6 +40,9 @@ public class Text {
         this.title = title;
         createdDate = new Date().toString();
     }
+    public String getTextShortSummary(){
+        return title + "\n" + createdDate;
+    }
     public String getTextSummary(){
         return title + "\n" + createdDate + "\n" + message;
     }
