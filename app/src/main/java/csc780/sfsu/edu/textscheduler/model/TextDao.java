@@ -19,6 +19,9 @@ public interface TextDao {
     @Query("SELECT * FROM texts")
     LiveData<List<Text>> getAll();
 
+    @Query("SELECT * FROM texts")
+    List<Text> getAllSync();
+
     @Query("SELECT * FROM texts WHERE id = :id LIMIT 1")
     LiveData<List<Text>> get(int id);
 
@@ -82,10 +85,11 @@ public interface TextDao {
     @Delete
     void delete(Text text);
 
+
     // Although usually not necessary, you can have this method return an int
     // value instead, indicating the number of rows deleted in the database.
     @Delete
-    void deleteTexts(Text... texts);
+    void deleteAll(Text... texts);
 
     // You can also define this class in a separate file, as long as you add the
     // "public" access modifier.

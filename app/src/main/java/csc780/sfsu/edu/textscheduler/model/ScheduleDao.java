@@ -16,6 +16,9 @@ public interface ScheduleDao {
     @Query("SELECT * FROM schedules")
     LiveData<List<Schedule>> getAll();
 
+    @Query("SELECT * FROM schedules")
+    List<Schedule> getAllSync();
+
     @Query("SELECT * FROM schedules WHERE id = :id LIMIT 1")
     LiveData<List<Schedule>> get(int id);
 
@@ -39,4 +42,7 @@ public interface ScheduleDao {
 
     @Delete
     void delete(Schedule schedule);
+
+    @Delete
+    void deleteAll(Schedule... schedule);
 }

@@ -3,12 +3,23 @@ package csc780.sfsu.edu.textscheduler.controllers.base;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.bluelinelabs.conductor.Controller;
-import csc780.sfsu.edu.textscheduler.ActionBarProvider;
+import com.bluelinelabs.conductor.ControllerChangeHandler;
+import com.bluelinelabs.conductor.ControllerChangeType;
 
-public abstract class BaseController extends RefWatchingController {
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+import csc780.sfsu.edu.textscheduler.ActionBarProvider;
+import csc780.sfsu.edu.textscheduler.TextApplication;
+
+public abstract class BaseController extends Controller {
+
+    private Unbinder unbinder;
+    private boolean hasExited;
 
     protected BaseController() { }
 
@@ -16,8 +27,36 @@ public abstract class BaseController extends RefWatchingController {
         super(args);
     }
 
-    // Note: This is just a quick demo of how an ActionBar *can* be accessed, not necessarily how it *should*
-    // be accessed. In a production app, this would use Dagger instead.
+    protected abstract View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container);
+
+    @NonNull
+    @Override
+    protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
+        View view = inflateView(inflater, container);
+        unbinder = ButterKnife.bind(this, view);
+        onViewBound(view);
+        return view;
+    }
+
+    protected void onViewBound(@NonNull View view) { }
+
+    @Override
+    protected void onDestroyView(@NonNull View view) {
+        super.onDestroyView(view);
+        unbinder.unbind();
+        unbinder = null;
+    }
+
+    @Override
+    protected void onChangeEnded(@NonNull ControllerChangeHandler changeHandler, @NonNull ControllerChangeType changeType) {
+        super.onChangeEnded(changeHandler, changeType);
+
+        hasExited = !changeType.isEnter;
+        if (isDestroyed()) {
+            TextApplication.refWatcher.watch(this);
+        }
+    }
+
     protected ActionBar getActionBar() {
         ActionBarProvider actionBarProvider = ((ActionBarProvider)getActivity());
         return actionBarProvider != null ? actionBarProvider.getSupportActionBar() : null;
@@ -47,5 +86,14 @@ public abstract class BaseController extends RefWatchingController {
 
     protected String getTitle() {
         return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (hasExited) {
+            TextApplication.refWatcher.watch(this);
+        }
     }
 }

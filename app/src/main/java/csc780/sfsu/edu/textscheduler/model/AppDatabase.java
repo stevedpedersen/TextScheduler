@@ -8,6 +8,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
+import java.util.Iterator;
+
 /**
  * Created by sp on 4/16/18.
  */
@@ -21,7 +23,10 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     // Create database, populate with dummy data, build
-                    INSTANCE = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).addCallback(sRoomDatabaseCallback).build();
+//                    INSTANCE = Room.inMemoryDatabaseBuilder(context, AppDatabase.class).addCallback(sRoomDatabaseCallback).build();
+                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
+                            AppDatabase.class, "text_database").addCallback(sRoomDatabaseCallback)
+                            .build();
                 }
             }
         }
@@ -55,16 +60,31 @@ public abstract class AppDatabase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(final Void... params) {
-            // deleteAll if you want to delete all our dummy data on start, then repopulate again
-            // mTextDao.deleteAll();
-            makeDummyData();
+//            deleteAll();
+//            makeDummyData();
             return null;
+        }
+
+        private void deleteAll() {
+            // deleteAll if you want to delete all our dummy data on start, then repopulate again
+            Iterator<Recipient> recip = mRecipientDao.getAllSync().iterator();
+            while (recip.hasNext()) {
+                mRecipientDao.deleteAll(recip.next());
+            }
+            Iterator<Schedule> sched = mScheduleDao.getAllSync().iterator();
+            while (sched.hasNext()) {
+                mScheduleDao.deleteAll(sched.next());
+            }
+            Iterator<Text> text = mTextDao.getAllSync().iterator();
+            while (text.hasNext()) {
+                mTextDao.deleteAll(text.next());
+            }
         }
 
         private void makeDummyData() {
             Text text = new Text();
             text.setTitle("Standard Happy Birthday Text");
-            text.setMessage("Happy Birthday! You're so old now!\n\n-Steve\nxoxo");
+            text.setMessage("Happy Birthday! You're so old now!");
             long textId = mTextDao.insertText(text);
 
             Recipient recipient = new Recipient((int) textId);
@@ -79,7 +99,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
             Text text2 = new Text();
             text2.setTitle("Happy Anniversary");
-            text2.setMessage("Happy Anniversary! I love you more every year!\n\n-Steve\nxoxo");
+            text2.setMessage("Happy Anniversary! I love you more every year!\n\nxoxo");
             long textId2 = mTextDao.insertText(text2);
 
             Recipient recipient2 = new Recipient((int) textId2);
@@ -94,7 +114,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
             Text text3 = new Text();
             text3.setTitle("Happy Father's Day");
-            text3.setMessage("Happy fathers day, old man.\n\n-Steve\nxoxo");
+            text3.setMessage("Happy fathers day, old man.\n\n-Steve");
             long textId3 = mTextDao.insertText(text3);
 
             Text text4 = new Text();

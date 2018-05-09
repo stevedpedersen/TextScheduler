@@ -20,14 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import csc780.sfsu.edu.textscheduler.R;
-import csc780.sfsu.edu.textscheduler.controllers.base.BaseController;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import csc780.sfsu.edu.textscheduler.controllers.base.BaseController;
 import csc780.sfsu.edu.textscheduler.model.Text;
 import csc780.sfsu.edu.textscheduler.model.TextViewModel;
-import csc780.sfsu.edu.textscheduler.util.BundleBuilder;
 
 public class DetailListPaneController extends BaseController {
 
@@ -158,7 +157,7 @@ public class DetailListPaneController extends BaseController {
 //                LiveData<List<Schedule>> schedule = mTextViewModel.getSchedule(tid);
 //                List<Schedule> sched = schedule.getValue();
 
-                tvTitle.setText(item.getTitle());
+                tvTitle.setText(item.getTextSummary());
 //                tvDescription.setText(item.getTextSummary());
                 this.position = position;
 

@@ -17,6 +17,9 @@ public interface RecipientDao {
     @Query("SELECT * FROM recipients")
     LiveData<List<Recipient>> getAll();
 
+    @Query("SELECT * FROM recipients")
+    List<Recipient> getAllSync();
+
 //    @Query("SELECT * FROM recipients WHERE id IN (:scheduleIds)")
 //    List<Schedule> loadAllByIds(int[] scheduleIds);
 
@@ -37,4 +40,7 @@ public interface RecipientDao {
 
     @Delete
     void delete(Recipient recipient);
+
+    @Delete
+    void deleteAll(Recipient... recipients);
 }

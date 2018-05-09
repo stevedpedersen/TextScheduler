@@ -5,7 +5,6 @@ import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.PorterDuff.Mode;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bluelinelabs.conductor.ControllerChangeHandler;
 import com.bluelinelabs.conductor.ControllerChangeType;
@@ -33,11 +31,11 @@ import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 
 import java.util.List;
 import csc780.sfsu.edu.textscheduler.R;
-import csc780.sfsu.edu.textscheduler.controllers.base.BaseController;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import csc780.sfsu.edu.textscheduler.controllers.base.BaseController;
 import csc780.sfsu.edu.textscheduler.model.Text;
 import csc780.sfsu.edu.textscheduler.model.TextViewModel;
 
@@ -50,8 +48,6 @@ public class HomeController extends BaseController {
 
     private static final String TAG = "HomeController";
     private static final String KEY_FAB_VISIBILITY = "HomeController.fabVisibility";
-    public static final int NEW_TEXT_ACTIVITY_REQUEST_CODE = 1;
-    public static final int RESULT_OK = 1;
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.fab) View fab;
@@ -76,11 +72,10 @@ public class HomeController extends BaseController {
         super.onViewBound(view);
 
         final TextListAdapter adapter = new TextListAdapter(view.getContext(), colors);
-        mTextViewModel = ViewModelProviders.of((FragmentActivity) activity).get(TextViewModel.class);
+        mTextViewModel = ViewModelProviders.of((FragmentActivity) getActivity()).get(TextViewModel.class);
         mTextViewModel.getAllTexts().observe(lifecycleOwner, new Observer<List<Text>>() {
             @Override
             public void onChanged(@Nullable final List<Text> texts) {
-                // update UI
                 // Update the cached copy of the texts in the adapter.
                 adapter.setTexts(texts);
             }
@@ -96,6 +91,8 @@ public class HomeController extends BaseController {
     protected void onSaveViewState(@NonNull View view, @NonNull Bundle outState) {
         super.onSaveViewState(view, outState);
         outState.putInt(KEY_FAB_VISIBILITY, fab.getVisibility());
+//        outState.putInt("recyclerview", recyclerView.getVisibility());
+//        mTextViewModel.getAllTexts().removeObservers(lifecycleOwner);
         Log.d(TAG, "------ in onSaveViewState()");
     }
 
@@ -106,7 +103,26 @@ public class HomeController extends BaseController {
 
         //noinspection WrongConstant
         fab.setVisibility(savedViewState.getInt(KEY_FAB_VISIBILITY));
+//        recyclerView.setVisibility(savedViewState.getInt("recyclerview"));
     }
+
+//    @Override
+//    protected void onSaveInstanceState(@NonNull Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        Log.d(TAG, "------ in onSaveInstanceState()");
+//
+//        outState.putInt(KEY_FAB_VISIBILITY, fab.getVisibility());
+//        outState.putInt("recyclerview", recyclerView.getVisibility());
+//    }
+//
+//    @Override
+//    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        Log.d(TAG, "------ in onRestoreInstanceState()");
+//
+//        fab.setVisibility(savedInstanceState.getInt(KEY_FAB_VISIBILITY));
+//        recyclerView.setVisibility(savedInstanceState.getInt("recyclerview"));
+//    }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
@@ -139,7 +155,7 @@ public class HomeController extends BaseController {
     }
 
     @OnClick(R.id.fab)
-    public void onFabClicked() {
+    protected void onFabClicked() {
         onFabClicked(true);
     }
 
@@ -150,13 +166,13 @@ public class HomeController extends BaseController {
 
     }
 
-    void onModelRowClick(Text text, int position, int color) {
+    private void onModelRowClick(Text text, int position, int color) {
         getRouter().pushController(RouterTransaction.with(new DetailListPaneController(text, color))
                 .pushChangeHandler(new FadeChangeHandler())
                 .popChangeHandler(new FadeChangeHandler()));
     }
 
-    public void setColors() {
+    private void setColors() {
         int[] colors = {R.color.red_300, R.color.blue_grey_300, R.color.purple_300,
                 R.color.orange_300, R.color.green_300, R.color.pink_300, R.color.deep_orange_300,
                 R.color.grey_300, R.color.lime_300, R.color.teal_300};
@@ -192,8 +208,8 @@ public class HomeController extends BaseController {
 
             void bind(int position, Text item) {
                 text = item;
-                this.color = colors[position];
-                tvTitle.setText(text.getTextSummary());
+                this.color = colors[position % colors.length];
+                tvTitle.setText(text.getTextShortSummary());
                 imgDot.getDrawable().setColorFilter(ContextCompat.getColor(getActivity(), this.color), Mode.SRC_ATOP);
                 this.position = position;
 

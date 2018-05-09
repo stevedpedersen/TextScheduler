@@ -38,7 +38,6 @@ public final class MainActivity extends AppCompatActivity implements ActionBarPr
 
     private Router router;
     private AppDatabase mDb;
-    private static final int NEW_TEXT_ACTIVITY_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +50,7 @@ public final class MainActivity extends AppCompatActivity implements ActionBarPr
 
         router = Conductor.attachRouter(this, container, savedInstanceState);
         if (!router.hasRootController()) {
-            HomeController homeController = new HomeController(this);
-            router.setRoot(RouterTransaction.with(homeController));
+            router.setRoot(RouterTransaction.with(new HomeController(this)));
         }
     }
 
